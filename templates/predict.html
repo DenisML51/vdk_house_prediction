@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <title>Предсказание цены недвижимости</title>
+    <style>
+.menu {
+    justify-content: space-between;
+    background-color: #1e2027;
+    box-shadow: 4px 5px 10px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+   }
+
+.menu li {
+    display: inline-block;
+    vertical-align: top;
+    padding: 25px;
+    font-size: 16px;
+
+    align-items: center;
+   }
+
+.menu ul {
+    padding: 0;
+    top: 0;
+    }
+
+.menu a {
+    text-decoration: none;
+    color: #e5e5e5;
+    }
+
+.act {
+    color: #e54f31;
+}
+
+.logo {
+    text-decoration: none;
+    color: #e54f31;
+
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.opt{
+    float: right;
+}
+
+.opt li {
+    cursor: pointer;
+
+}
+
+.active{
+    background-color: #3e72ed;
+    color: #000000;
+    }
+
+.active a:visited{
+    color: #f8f8f8;
+    }
+
+.menu a:hover{
+    color: #e54f31;
+    }
+
+.sc1 {
+    color: #e54f31;
+}
+
+.sc2 {
+    color: #1e2027;
+}
+
+.opt button {
+    background-color: #e25133;
+    border: 1px solid #e25133;
+    color: #1e2027;
+    padding: 12px 26px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.3s;
+    margin-top: -15px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.opt button:hover {
+    background-color: #1e2027;
+    color: #e25133;
+    border: 1px solid #e25133;
+}
+
+        body {
+    top: 0;
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #e5e5e5;
+    background-color: #262a2f;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        .container {
+            width: 60%;
+            margin: 30px auto;
+            background-color: #1e2027;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 4px 5px 10px rgba(0, 0, 0, 0.4);
+                -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        h1 {
+            color: #e54f31;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-wrapper {
+            position: sticky;
+            margin-bottom: 25px;
+            margin-right: 25px;
+        }
+
+        .float-label {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            color: #aaa;
+            font-size: 14px;
+            pointer-events: none;
+            transition: all 0.2s ease-in-out;
+            transform: translateY(-50%);
+        }
+
+        input:focus + .float-label,
+        input:not(:placeholder-shown) + .float-label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #e54f31;
+            background-color: #1e2027;
+            padding: 0 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 10px;
+            border: 1px solid #e54f31;
+            border-radius: 8px;
+            background-color: #1e2027;
+            color: #e5e5e5;
+            font-size: 14px;
+            position: sticky;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e54f31;
+            border-radius: 8px;
+            background-color: #1e2027;
+            color: #e5e5e5;
+            font-size: 14px;
+        }
+
+        button {
+                background-color: #e25133;
+    border: 1px solid #e25133;
+    color: #1e2027;
+    padding: 12px 26px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.3s;
+    margin-top: -15px;
+    cursor: pointer;
+    border-radius: 12px;
+        }
+
+        button:hover {
+                background-color: #1e2027;
+    color: #e25133;
+    border: 1px solid #e25133;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #2c2f36;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #e54f31;
+            text-align: center;
+            box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            margin-top: 20px;
+            color: #e5e5e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <ul>
+            <li class="logo"><a href="{{ url_for('index') }}">Главная</a></li>
+            <div class="opt">
+                <li><a href="{{ url_for('diamonds') }}">Бриллианты</a></li>
+                <li><a href="{{ url_for('data') }}">Данные</a></li>
+                <li><a href="{{ url_for('metrics') }}">Метрики моделей</a></li>
+                <li><a href="{{ url_for('predict') }}"><button type="submit"><b>Построить прогноз</b></button></a></li>
+           </div>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>Предсказание цены недвижимости</h1>
+
+        <form action="{{ url_for('predict') }}" method="post">
+            <label for="model"><b>Выберите модель:</b></label>
+            <select name="model" id="model" required>
+                <option value="linear_regression" {% if request.form.get('model') == 'linear_regression' %}selected{% endif %}>Линейная регрессия</option>
+                <option value="lasso_regression" {% if request.form.get('model') == 'lasso_regression' %}selected{% endif %}>Lasso регрессия</option>
+                <option value="ridge_regression" {% if request.form.get('model') == 'ridge_regression' %}selected{% endif %}>Ridge регрессия</option>
+                <option value="elastic_net" {% if request.form.get('model') == 'elastic_net' %}selected{% endif %}>ElasticNet</option>
+                <option value="random_forest" {% if request.form.get('model') == 'random_forest' %}selected{% endif %}>Случайный лес</option>
+                <option value="sv_regression" {% if request.form.get('model') == 'sv_regression' %}selected{% endif %}>SVR</option>
+            </select>
+
+            <div id="numerical-fields">
+                <h4>Введите данные:</h4>
+
+                <div class="input-wrapper">
+                    <input type="number" step="any" name="rooms" id="rooms" value="{{ request.form.get('rooms', '') }}" placeholder=" " required>
+                    <label class="float-label" for="rooms">Количество комнат</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="any" name="area" id="area" value="{{ request.form.get('area', '') }}" placeholder=" " required>
+                    <label class="float-label" for="area">Площадь (кв. м)</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="any" name="kitchen_area" id="kitchen_area" value="{{ request.form.get('kitchen_area', '') }}" placeholder=" " required>
+                    <label class="float-label" for="kitchen_area">Площадь кухни (кв. м)</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="1" name="Годпостройки" id="Годпостройки" value="{{ request.form.get('Годпостройки', '') }}" placeholder=" " required>
+                    <label class="float-label" for="Годпостройки">Год постройки</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="1" name="Количествоэтажей" id="Количествоэтажей" value="{{ request.form.get('Количествоэтажей', '') }}" placeholder=" " required>
+                    <label class="float-label" for="Количествоэтажей">Количество этажей в доме</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="1" name="Количествобалконов" id="Количествобалконов" value="{{ request.form.get('Количествобалконов', '') }}" placeholder=" " required>
+                    <label class="float-label" for="Количествобалконов">Количество балконов</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="1" name="Количествоквартир" id="Количествоквартир" value="{{ request.form.get('Количествоквартир', '') }}" placeholder=" " required>
+                    <label class="float-label" for="Количествоквартир">Количество квартир в доме</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="1" name="Количествоподъездов" id="Количествоподъездов" value="{{ request.form.get('Количествоподъездов', '') }}" placeholder=" " required>
+                    <label class="float-label" for="Количествоподъездов">Количество подъездов в доме</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="1" name="number_of_owners" id="number_of_owners" value="{{ request.form.get('number_of_owners', '') }}" placeholder=" " required>
+                    <label class="float-label" for="number_of_owners">Количество собственников</label>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="number" step="1" name="number_of_elevators" id="number_of_elevators" value="{{ request.form.get('number_of_elevators', '') }}" placeholder=" " required>
+                    <label class="float-label" for="number_of_elevators">Количество лифтов</label>
+                </div>
+            </div>
+
+            <div id="categorical-fields">
+                <label for="renovation">Тип ремонта:</label>
+                <select name="renovation" required>
+                    <option value="renovation_Евро" {% if request.form.get('renovation') == 'renovation_Евро' %}selected{% endif %}>Евроремонт</option>
+                    <option value="renovation_Косметический" {% if request.form.get('renovation') == 'renovation_Косметический' %}selected{% endif %}>Косметический ремонт</option>
+                    <option value="renovation_Отсутствует" {% if request.form.get('renovation') == 'renovation_Отсутствует' %}selected{% endif %}>Отсутствует</option>
+                </select>
+
+                <label for="deal_type">Тип сделки:</label>
+                <select name="deal_type">
+                    <option value="" {% if request.form.get('deal_type') == '' %}selected{% endif %}>Отсутствует</option>
+                    <option value="deal_type_Свободная продажа" {% if request.form.get('deal_type') == 'deal_type_Свободная продажа' %}selected{% endif %}>Свободная продажа</option>
+                </select>
+
+                <label for="Материалстен">Материал стен:</label>
+                <select name="Материалстен" required>
+                    <option value="Материалстен_Железобетон" {% if request.form.get('Материалстен') == 'Материалстен_Железобетон' %}selected{% endif %}>Железобетон</option>
+                    <option value="Материалстен_Кирпично-монолитный" {% if request.form.get('Материалстен') == 'Материалстен_Кирпично-монолитный' %}selected{% endif %}>Кирпично-монолитный</option>
+                    <option value="Материалстен_Кирпичный" {% if request.form.get('Материалстен') == 'Материалстен_Кирпичный' %}selected{% endif %}>Кирпичный</option>
+                    <option value="Материалстен_Монолитный" {% if request.form.get('Материалстен') == 'Материалстен_Монолитный' %}selected{% endif %}>Монолитный</option>
+                    <option value="Материалстен_Панельный" {% if request.form.get('Материалстен') == 'Материалстен_Панельный' %}selected{% endif %}>Панельный</option>
+                    <option value="Материалстен_Смешанные" {% if request.form.get('Материалстен') == 'Материалстен_Смешанные' %}selected{% endif %}>Смешанные</option>
+                </select>
+
+                <label for="Сериядома">Серия дома:</label>
+                <select name="Сериядома" required>
+                    <option value="Сериядома_1-513" {% if request.form.get('Сериядома') == 'Сериядома_1-513' %}selected{% endif %}>1-513</option>
+                    <option value="Сериядома_121" {% if request.form.get('Сериядома') == 'Сериядома_121' %}selected{% endif %}>121</option>
+                    <option value="Сериядома_121. многоквартирный дом" {% if request.form.get('Сериядома') == 'Сериядома_121. многоквартирный дом' %}selected{% endif %}>121 (многоквартирный дом)</option>
+                    <option value="Сериядома_14/14, индивидуальный" {% if request.form.get('Сериядома') == 'Сериядома_14/14, индивидуальный' %}selected{% endif %}>14/14 (индивидуальный)</option>
+                    <option value="Сериядома_2.многоквартирный" {% if request.form.get('Сериядома') == 'Сериядома_2.многоквартирный' %}selected{% endif %}>2 (многоквартирный)</option>
+                    <option value="Сериядома_25" {% if request.form.get('Сериядома') == 'Сериядома_25' %}selected{% endif %}>25</option>
+                    <option value="Сериядома_89152-к примогражданпроект" {% if request.form.get('Сериядома') == 'Сериядома_89152-к примогражданпроект' %}selected{% endif %}>89152-к (Примогражданпроект)</option>
+                    <option value="Сериядома_II-01" {% if request.form.get('Сериядома') == 'Сериядома_II-01' %}selected{% endif %}>II-01</option>
+                    <option value="Сериядома_II-03" {% if request.form.get('Сериядома') == 'Сериядома_II-03' %}selected{% endif %}>II-03</option>
+                    <option value="Сериядома_II-32" {% if request.form.get('Сериядома') == 'Сериядома_II-32' %}selected{% endif %}>II-32</option>
+                    <option value="Сериядома_II-66" {% if request.form.get('Сериядома') == 'Сериядома_II-66' %}selected{% endif %}>II-66</option>
+                    <option value="Сериядома_v-кирпичный" {% if request.form.get('Сериядома') == 'Сериядома_v-кирпичный' %}selected{% endif %}>V (кирпичный)</option>
+                    <option value="Сериядома_ПП-83" {% if request.form.get('Сериядома') == 'Сериядома_ПП-83' %}selected{% endif %}>ПП-83</option>
+                    <option value="Сериядома_у-0101" {% if request.form.get('Сериядома') == 'Сериядома_у-0101' %}selected{% endif %}>У-0101</option>
+                </select>
+
+                <label for="Типперекрытий">Тип перекрытий:</label>
+                <select name="Типперекрытий" required>
+                    <option value="Типперекрытий_Железобетонный" {% if request.form.get('Типперекрытий') == 'Типперекрытий_Железобетонный' %}selected{% endif %}>Железобетонный</option>
+                    <option value="Типперекрытий_Монолитный" {% if request.form.get('Типперекрытий') == 'Типперекрытий_Монолитный' %}selected{% endif %}>Монолитный</option>
+                    <option value="Типперекрытий_Смешанный" {% if request.form.get('Типперекрытий') == 'Типперекрытий_Смешанный' %}selected{% endif %}>Смешанный</option>
+                </select>
+
+                <label for="Типфундамента">Тип фундамента:</label>
+                <select name="Типфундамента" required>
+                    <option value="Типфундамента_Иной" {% if request.form.get('Типфундамента') == 'Типфундамента_Иной' %}selected{% endif %}>Иной</option>
+                    <option value="Типфундамента_Ленточный" {% if request.form.get('Типфундамента') == 'Типфундамента_Ленточный' %}selected{% endif %}>Ленточный</option>
+                    <option value="Типфундамента_Сборный" {% if request.form.get('Типфундамента') == 'Типфундамента_Сборный' %}selected{% endif %}>Сборный</option>
+                    <option value="Типфундамента_Свайный" {% if request.form.get('Типфундамента') == 'Типфундамента_Свайный' %}selected{% endif %}>Свайный</option>
+                    <option value="Типфундамента_Сплошной" {% if request.form.get('Типфундамента') == 'Типфундамента_Сплошной' %}selected{% endif %}>Сплошной</option>
+                </select>
+
+                <label for="Горячееводоснабжение">Горячее водоснабжение:</label>
+                <select name="Горячееводоснабжение">
+                    <option value="" {% if request.form.get('Горячееводоснабжение') == '' %}selected{% endif %}>Отсутствует</option>
+                    <option value="Горячееводоснабжение_Поквартирный котел" {% if request.form.get('Горячееводоснабжение') == 'Горячееводоснабжение_Поквартирный котел' %}selected{% endif %}>Поквартирный котел</option>
+                </select>
+
+                <label for="Теплоснабжение">Теплоснабжение:</label>
+                <select name="Теплоснабжение">
+                    <option value="" {% if request.form.get('Теплоснабжение') == '' %}selected{% endif %}>Отсутствует</option>
+                    <option value="Теплоснабжение_Центральное" {% if request.form.get('Теплоснабжение') == 'Теплоснабжение_Центральное' %}selected{% endif %}>Центральное</option>
+                </select>
+
+                <label for="energy_efficiency_class">Класс энергоэффективности:</label>
+                <select name="energy_efficiency_class" required>
+                    <option value="energy_efficiency_class_C" {% if request.form.get('energy_efficiency_class') == 'energy_efficiency_class_C' %}selected{% endif %}>C</option>
+                    <option value="energy_efficiency_class_D" {% if request.form.get('energy_efficiency_class') == 'energy_efficiency_class_D' %}selected{% endif %}>D</option>
+                    <option value="energy_efficiency_class_E" {% if request.form.get('energy_efficiency_class') == 'energy_efficiency_class_E' %}selected{% endif %}>E</option>
+                </select>
+
+                <label for="ventilation">Тип вентиляции:</label>
+                <select name="ventilation">
+                    <option value="" {% if request.form.get('ventilation') == '' %}selected{% endif %}>Отсутствует</option>
+                    <option value="ventilation_Приточно-вытяжная" {% if request.form.get('ventilation') == 'ventilation_Приточно-вытяжная' %}selected{% endif %}>Приточно-вытяжная</option>
+                </select>
+            </div>
+
+            <button type="submit"><b>Построить прогноз</b></button>
+        </form>
+
+        {% if prediction is not none %}
+            <div class="result">
+                <h2>Цена на недвижимость: {{ prediction }} р.</h2>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результативность моделей</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+</head>
+<body>
+    <div class="menu">
+        <ul>
+            <li class="logo"><a href="{{ url_for('index') }}">Главная</a></li>
+            <div class="opt">
+                <li><a href="{{ url_for('diamonds') }}">Бриллианты</a></li>
+                <li><a href="{{ url_for('data') }}">Данные</a></li>
+                <li class="logo">Метрики моделей</li>
+                <li><a href="{{ url_for('predict') }}"><button type="submit"><b>Построить прогноз</b></button></a></li>
+           </div>
+        </ul>
+    </div>
+
+    <div class="container">
+    {% for model in models_data %}
+    <div class="model-card">
+        <h2>{{ model.model_name }}</h2>
+            <div class="metrics">
+                <table class="table-dark">
+                    <tr>
+                        <th>Метрика</th>
+                        {% for metric in model.metrics_data.keys() %}
+                            <th>{{ metric }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Значение</th>
+                        {% for value in model.metrics_data.values() %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                </table>
+            </div>
+        <div class="metrics">
+            {% for graph_path in model.graph_paths %}
+            <div class="graph">
+                <img src="{{ url_for('static', filename='images/' + graph_path) }}" alt="График" style="width:100%; height:auto;">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</body>
+</html>

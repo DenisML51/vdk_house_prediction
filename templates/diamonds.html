@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Предсказание цены бриллиантов</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <link rel="stylesheet" type="text/css" href="/static/main.css">
+<style>
+
+    .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #3b3e44;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+        border: 1px solid #3b3e44;
+        text-align: center;
+    }
+
+    th {
+        background-color: #23272a;
+        color: #f5f6fa;
+        font-weight: bold;
+    }
+
+    td {
+        background-color: #2c2f33;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #32353b;
+    }
+    .menu {
+        justify-content: space-between;
+        background-color: #1e2027;
+        box-shadow: 4px 5px 10px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+       }
+
+    .menu li {
+        display: inline-block;
+        vertical-align: top;
+        padding: 25px;
+        font-size: 16px;
+
+        align-items: center;
+       }
+
+    .menu ul {
+        padding: 0;
+        top: 0;
+        }
+
+    .menu a {
+        text-decoration: none;
+        color: #e5e5e5;
+        }
+
+    .act {
+        color: #e54f31;
+    }
+
+    .logo {
+        text-decoration: none;
+        color: #e54f31;
+
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .opt{
+        float: right;
+    }
+
+    .opt li {
+        cursor: pointer;
+
+    }
+
+    .active{
+        background-color: #3e72ed;
+        color: #000000;
+        }
+
+    .active a:visited{
+        color: #f8f8f8;
+        }
+
+    .menu a:hover{
+        color: #e54f31;
+        }
+
+    .opt button {
+        background-color: #e25133;
+        border: 1px solid #e25133;
+        color: #1e2027;
+        padding: 12px 26px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        transition-duration: 0.3s;
+        margin-top: -15px;
+        cursor: pointer;
+        border-radius: 12px;
+    }
+
+    .opt button:hover {
+        background-color: #1e2027;
+        color: #e25133;
+        border: 1px solid #e25133;
+    }
+
+    body {
+        top: 0;
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #e5e5e5;
+        background-color: #262a2f;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    .container-wrapper {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .container-1, .container-2, .container-3, .container-4, .container-5, .container-6 {
+        background-color: #1e2027;
+        padding: 20px;
+        margin-right: 50px;
+        margin-left: 50px;
+        width: 100%;
+        border-radius: 16px;
+
+        box-shadow: 4px 5px 10px rgba(0, 0, 0, 0.4);
+        margin-bottom: 20px;
+    }
+
+    .container h1 {
+        color: #e54f31;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .container-1 form {
+        width: 100%;
+    }
+
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #2c2f36;
+        border-radius: 8px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #e54f31;
+        text-align: center;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+
+    h1 {
+        color: #e54f31;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form1 {
+        display: flex;
+        width: 80%;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .input-wrapper {
+        position: sticky;
+        margin-bottom: 25px;
+        margin-right: 50px;
+    }
+
+    .param-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        background-color: #2b2f36;
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .param-wrapper label {
+        font-weight: bold;
+        color: #e5e5e5;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+
+
+    .param-wrapper input {
+        width: 100%; /* Поле ввода займет всю доступную ширину контейнера */
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #e54f31;
+        border-radius: 8px;
+        background-color: #1e2027;
+        color: #e5e5e5;
+        font-size: 14px;
+        box-sizing: border-box; /* Включаем отступы в расчет ширины */
+    }
+    .param-wrapper select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 8px;
+        border: 1px solid #e54f31;
+        border-radius: 8px;
+        background-color: #1e2027;
+        color: #e5e5e5;
+        font-size: 14px;
+        transition: border 0.3s ease;
+    }
+
+    .param-wrapper input:focus,
+    .param-wrapper select:focus {
+        outline: none;
+        border-color: #e54f31;
+        box-shadow: 0 0 5px rgba(229, 79, 49, 0.5);
+    }
+
+    .param-wrapper .param-description {
+        font-size: 14px;
+        color: #999;
+        margin-top: 5px;
+        background-color: #23272a;
+        padding: 8px;
+        border-radius: 6px;
+        line-height: 1.4;
+    }
+
+    .param-wrapper .param-description:hover {
+        background-color: #2c2f36;
+        color: #e5e5e5;
+    }
+
+    .float-label {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        color: #aaa;
+        font-size: 14px;
+        pointer-events: none;
+        transition: all 0.2s ease-in-out;
+        transform: translateY(-50%);
+        }
+
+    input:focus + .float-label, input:not(:placeholder-shown) + .float-label {
+        top: -10px;
+        left: 10px;
+        font-size: 12px;
+        color: #e54f31;
+        background-color: #1e2027;
+    }
+
+    input {
+        width: 103.8%;
+        padding: 14px 10px;
+        border: 1px solid #e54f31;
+        border-radius: 8px;
+        background-color: #1e2027;
+        color: #e5e5e5;
+        font-size: 14px;
+        position: sticky;
+        box-sizing: border-box;
+    }
+
+    select {
+        width: 100%;
+        padding: 14px 10px;
+        margin-bottom: 15px;
+        border: 1px solid #e54f31;
+        border-radius: 8px;
+        background-color: #1e2027;
+        color: #e5e5e5;
+        font-size: 14px;
+        position: sticky;
+
+    }
+
+    input[type="number"] {
+    position: relative;
+    -moz-appearance: textfield;
+}
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type="number"]::after {
+        content: "▲";
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        color: #e54f31;
+        font-size: 12px;
+    }
+
+    input[type="number"]::before {
+        content: "▼";
+        position: absolute;
+        right: 10px;
+        bottom: 5px;
+        color: #e54f31;
+        font-size: 12px;
+        pointer-events: none;
+    }
+
+
+    button {
+        background-color: #e25133;
+        border: 1px solid #e25133;
+        color: #1e2027;
+        padding: 12px 26px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        transition-duration: 0.3s;
+        margin-top: -15px;
+        cursor: pointer;
+        border-radius: 12px;
+    }
+
+    button:hover {
+        background-color: #1e2027;
+        color: #e25133;
+        border: 1px solid #e25133;
+    }
+
+
+    h3 {
+        margin-top: 20px;
+        color: #e54f31;
+    }
+
+    h2 {
+        margin-top: 20px;
+        color: #e54f31;
+    }
+
+    h5 {
+        margin-top: 20px;
+        color: #e54f31;
+    }
+
+    .container p {
+        font-size: 40px;
+    }
+
+    /* Стили модального окна */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: #1e2027;
+    padding: 20px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 1000px;
+    max-height: 80%;
+    overflow-y: auto; /* Прокрутка содержимого */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+    display: inline-block;
+    background-color: #e25133;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.modal-close:hover {
+    background-color: #d4462a;
+}
+
+.modal-open {
+    display: inline-block;
+    background-color: #e54f31;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.modal-open:hover {
+    background-color: #d4462a;
+}
+
+/* Стили для полосы прокрутки внутри модального окна */
+.modal-content::-webkit-scrollbar {
+    width: 10px; /* Ширина полосы прокрутки */
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background-color: #e25133; /* Цвет полосы прокрутки */
+    border-radius: 5px; /* Радиус скругления */
+    border: 2px solid #1e2027; /* Обводка вокруг полосы прокрутки */
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background-color: #2c2f36; /* Цвет фона дорожки прокрутки */
+    border-radius: 5px;
+}
+
+/* Плавное изменение цвета при наведении на полосу прокрутки */
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background-color: #d4462a; /* Цвет полосы прокрутки при наведении */
+}
+
+
+
+    </style>
+</head>
+
+<body>
+
+    <div class="menu">
+        <ul>
+            <li class="logo"><a href="{{ url_for('index') }}">Главная</a></li>
+            <div class="opt">
+                <li class="logo">Бриллианты</li>
+                <li><a href="{{ url_for('data') }}">Данные</a></li>
+                <li><a href="{{ url_for('metrics') }}">Метрики моделей</a></li>
+                <li><a href="{{ url_for('predict') }}"><button type="submit"><b>Построить прогноз</b></button></a></li>
+           </div>
+
+        </ul>
+    </div>
+
+
+            <h1>Предсказание цены бриллиантов</h1>
+
+<div class="container-wrapper">
+        <div id="modal-container" class="modal hidden">
+    <div id="modal-content" class="modal-content">
+        <button id="close-modal" class="modal-close">Закрыть</button>
+        <form id="model-form" class='form1' action="{{ url_for('diamonds') }}" method="post">
+            <h3><label for="model">Выберите модель:</label></h3>
+            <select name="model" id="model" required oninput="updateParams(this.value)">
+                {% for model in models %}
+                    <option value="{{ model }}"{% if request.form.get('model') == model %}selected{% endif %}>{{ model}}</option>
+
+                {% endfor %}
+            </select>
+
+            <div id="params">
+                <div id="param-fields"></div>
+            </div>
+
+            {% if metrics %}
+                <h2>Метрики модели на тесте:</h2>
+                    <div class="table-container">
+                        {{ metrics|safe }}
+                    </div>
+            {% endif %}
+
+            {% if metrics_train %}
+                <h2>Метрики модели на обучении:</h2>
+                    <div class="table-container">
+                        {{ metrics_train|safe }}
+                    </div>
+            {% endif %}
+            <input type="hidden" name="model1" value="1">
+            <p><button type="submit">Обучить модель</button></p>
+
+        </form>
+    </div>
+
+    </div>
+    <div class="container-2">
+        <form id="data-form" action="{{ url_for('diamonds') }}" method="post">
+            <h3>Введите данные:</h3>
+
+            <div class="input-wrapper">
+                <input type="number" step="any" name="Carat Weight" id="carat_weight" value="{{ request.form.get('Carat Weight', '') }}" placeholder=" " required>
+                <label class="float-label" for="carat_weight">Вес в каратах</label>
+            </div>
+
+            <label for="Cut">Качество огранки</label>
+            <select name="Cut" id="cut" required>
+                <option value="Ideal" {% if request.form.get('Cut') == 'Ideal' %}selected{% endif %}>Ideal</option>
+                <option value="Very Good" {% if request.form.get('Cut') == 'Very Good' %}selected{% endif %}>Very Good</option>
+                <option value="Fair" {% if request.form.get('Cut') == 'Fair' %}selected{% endif %}>Fair</option>
+                <option value="Good" {% if request.form.get('Cut') == 'Good' %}selected{% endif %}>Good</option>
+                <option value="Signature-Ideal" {% if request.form.get('Cut') == 'Signature-Ideal' %}selected{% endif %}>Signature-Ideal</option>
+            </select>
+
+            <label for="Color">Цвет</label>
+            <select name="Color" id="color" required>
+                <option value="H" {% if request.form.get('Color') == 'H' %}selected{% endif %}>H</option>
+                <option value="E" {% if request.form.get('Color') == 'E' %}selected{% endif %}>E</option>
+                <option value="G" {% if request.form.get('Color') == 'G' %}selected{% endif %}>G</option>
+                <option value="D" {% if request.form.get('Color') == 'D' %}selected{% endif %}>D</option>
+                <option value="F" {% if request.form.get('Color') == 'F' %}selected{% endif %}>F</option>
+                <option value="I" {% if request.form.get('Color') == 'I' %}selected{% endif %}>I</option>
+            </select>
+
+            <label for="Clarity">Чистота</label>
+            <select name="Clarity" id="clarity" required>
+                <option value="SI1" {% if request.form.get('Clarity') == 'SI1' %}selected{% endif %}>SI1</option>
+                <option value="VS1" {% if request.form.get('Clarity') == 'VS1' %}selected{% endif %}>VS1</option>
+                <option value="VS2" {% if request.form.get('Clarity') == 'VS2' %}selected{% endif %}>VS2</option>
+                <option value="VVS2" {% if request.form.get('Clarity') == 'VVS2' %}selected{% endif %}>VVS2</option>
+                <option value="VVS1" {% if request.form.get('Clarity') == 'VVS1' %}selected{% endif %}>VVS1</option>
+                <option value="IF" {% if request.form.get('Clarity') == 'IF' %}selected{% endif %}>IF</option>
+                <option value="FL" {% if request.form.get('Clarity') == 'FL' %}selected{% endif %}>FL</option>
+            </select>
+
+            {{qwert}}
+
+            <label for="Polish">Полировка</label>
+            <select name="Polish" id="polish" required>
+                <option value="VG" {% if request.form.get('Polish') == 'VG' %}selected{% endif %}>VG</option>
+                <option value="ID" {% if request.form.get('Polish') == 'ID' %}selected{% endif %}>ID</option>
+                <option value="EX" {% if request.form.get('Polish') == 'EX' %}selected{% endif %}>EX</option>
+                <option value="G" {% if request.form.get('Polish') == 'G' %}selected{% endif %}>G</option>
+            </select>
+
+            <label for="Symmetry">Симметрия</label>
+            <select name="Symmetry" id="symmetry" required>
+                <option value="EX" {%if request.form.get('Symmetry') == 'EX' %}selected{% endif %}>EX</option>
+                <option value="ID" {%if request.form.get('Symmetry') == 'ID' %}selected{% endif %}>ID</option>
+                <option value="VG" {%if request.form.get('Symmetry') == 'VG' %}selected{% endif %}>VG</option>
+                <option value="G" {%if request.form.get('Symmetry') == 'G' %}selected{% endif %}>G</option>
+            </select>
+
+            <label for="Report">Сертификат</label>
+            <select name="Report" id="report" required>
+                <option value="GIA" {%if request.form.get('Report') == 'GIA' %}selected{% endif %}>GIA</option>
+                <option value="AGSL" {%if request.form.get('Report') == 'AGSL' %}selected{% endif %}>AGSL</option>
+            </select>
+            <input type="hidden" name="data" value="1">
+
+            {{prediction}}
+
+            <p><button type="submit">Построить прогноз</button></p>
+        </form>
+            <button id="open-modal" class="modal-open">Модель</button>
+
+
+
+        {% if prediction is not none %}
+            <div class="result">
+
+                <h3>Предсказанная цена: ${{ prediction }}</h3>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<script>
+const modelParams = {
+    "linear_regression": {
+        "display_name": "Линейная Регрессия",
+        "fit_intercept": {
+            "type": "bool",
+            "description": "Добавлять ли константу в модель (1 - да, 0 - нет)."
+        }
+    },
+    "lasso_regression": {
+        "display_name": "Регрессия Лассо",
+        "alpha": {
+            "type": "float",
+            "description": "Параметр регуляризации, контролирующий величину штрафа (0.0 < alpha ≤ 1.0)."
+        },
+        "fit_intercept": {
+            "type": "bool",
+            "description": "Добавлять ли константу в модель (1 - да, 0 - нет)."
+        },
+        "max_iter": {
+            "type": "integer",
+            "description": "Максимальное количество итераций для оптимизации (≥ 1)."
+        },
+        "tol": {
+            "type": "float",
+            "description": "Точность остановки алгоритма (tol > 0)."
+        }
+    },
+    "ridge_regression": {
+        "display_name": "Ridge Регрессия",
+        "alpha": {
+            "type": "float",
+            "description": "Параметр регуляризации, контролирующий величину штрафа (0.0 < alpha ≤ 1.0)."
+        },
+        "fit_intercept": {
+            "type": "bool",
+            "description": "Добавлять ли константу в модель (1 - да, 0 - нет)."
+        },
+        "solver": {
+            "type": "select:svd,cholesky,lsqr,sparse_cg,sag,saga,auto",
+            "description": "Метод решения для оптимизации."
+        },
+        "max_iter": {
+            "type": "integer",
+            "description": "Максимальное количество итераций для оптимизации (≥ 1)."
+        }
+    },
+    "random_forest": {
+        "display_name": "Случайный Лес Регрессия",
+        "n_estimators": {
+            "type": "integer",
+            "description": "Количество деревьев в лесу (n_estimators ≥ 1)."
+        },
+        "max_depth": {
+            "type": "integer",
+            "description": "Максимальная глубина деревьев (max_depth ≥ 1 или None)."
+        },
+        "min_samples_split": {
+            "type": "integer",
+            "description": "Минимальное количество выборок для разбиения узла (≥ 2)."
+        },
+        "min_samples_leaf": {
+            "type": "integer",
+            "description": "Минимальное количество выборок в листовом узле (≥ 1)."
+        },
+        "max_features": {
+            "type": "select:auto,sqrt,log2",
+            "description": "Количество признаков для поиска лучшего разделения."
+        },
+        "bootstrap": {
+            "type": "bool",
+            "description": "Использовать ли выборку с возвращением (1 - да, 0 - нет)."
+        }
+    },
+    "svr": {
+        "display_name": "Регрессия Опорных Векторов",
+        "C": {
+            "type": "float",
+            "description": "Параметр регуляризации (C > 0)."
+        },
+        "kernel": {
+            "type": "select:linear,poly,rbf,sigmoid",
+            "description": "Тип ядра, используемого алгоритмом."
+        },
+        "gamma": {
+            "type": "select:scale,auto",
+            "description": "Коэффициент для ядра."
+        },
+        "epsilon": {
+            "type": "float",
+            "description": "Допустимая ошибка в рамках модели (ε ≥ 0)."
+        },
+        "degree": {
+            "type": "integer",
+            "description": "Степень полинома для ядра poly (degree ≥ 1)."
+        }
+    },
+    "Bayesian_Ridge": {
+        "display_name": "Байесовская Регрессия",
+        "alpha_1": {
+            "type": "float",
+            "description": "Гиперпараметр для априорного распределения альфа 1 (alpha_1 > 0)."
+        },
+        "alpha_2": {
+            "type": "float",
+            "description": "Гиперпараметр для априорного распределения альфа 2 (alpha_2 > 0)."
+        },
+        "lambda_1": {
+            "type": "float",
+            "description": "Гиперпараметр для априорного распределения лямбда 1 (lambda_1 > 0)."
+        },
+        "lambda_2": {
+            "type": "float",
+            "description": "Гиперпараметр для априорного распределения лямбда 2 (lambda_2 > 0)."
+        },
+        "tol": {
+            "type": "float",
+            "description": "Точность остановки алгоритма (tol > 0)."
+        }
+    },
+    "SGD_Regressor": {
+        "display_name": "Регрессия SGD",
+        "alpha": {
+            "type": "float",
+            "description": "Параметр регуляризации (alpha > 0)."
+        },
+        "max_iter": {
+            "type": "integer",
+            "description": "Максимальное количество итераций (≥ 1)."
+        },
+        "tol": {
+            "type": "float",
+            "description": "Точность остановки алгоритма (tol > 0)."
+        },
+        "learning_rate": {
+            "type": "select:constant,optimal,invscaling,adaptive",
+            "description": "Метод изменения скорости обучения."
+        },
+        "eta0": {
+            "type": "float",
+            "description": "Начальная скорость обучения (eta0 > 0)."
+        }
+    },
+    "Gradient_Boosting_Regressor": {
+        "display_name": "Градиентный Бустинг",
+        "n_estimators": {
+            "type": "integer",
+            "description": "Количество базовых моделей (деревьев) (n_estimators ≥ 1)."
+        },
+        "max_depth": {
+            "type": "integer",
+            "description": "Максимальная глубина дерева (max_depth ≥ 1)."
+        },
+        "learning_rate": {
+            "type": "float",
+            "description": "Скорость обучения (0.0 < learning_rate ≤ 1.0)."
+        },
+        "loss": {
+            "type": "select:squared_error,absolute_error,huber,quantile",
+            "description": "Функция потерь для оптимизации."
+        },
+        "subsample": {
+            "type": "float",
+            "description": "Доля выборки для построения каждого дерева (0.0 < subsample ≤ 1.0)."
+        },
+        "min_samples_split": {
+            "type": "integer",
+            "description": "Минимальное количество выборок для разбиения узла (≥ 2)."
+        },
+        "min_samples_leaf": {
+            "type": "integer",
+            "description": "Минимальное количество выборок в листовом узле (≥ 1)."
+        }
+    }
+};
+
+
+    function updateParams(model) {
+    const paramsDiv = document.getElementById('param-fields');
+    paramsDiv.innerHTML = ''; // Очищаем поле параметров
+
+    // Получаем название модели
+    const displayName = modelParams[model]?.display_name || model;
+
+    // Добавляем заголовок с названием модели
+    const modelTitle = document.createElement('h4');
+    modelTitle.textContent = `Настройка гиперпараметров для: ${displayName}`;
+    modelTitle.style.color = '#e54f31';
+    modelTitle.style.marginBottom = '10px';
+    paramsDiv.appendChild(modelTitle);
+
+    // Генерация полей для гиперпараметров
+    const params = modelParams[model];
+    const savedParams = JSON.parse(localStorage.getItem('modelParams') || '{}')[model] || {};
+
+    for (const [key, details] of Object.entries(params)) {
+        if (key === "display_name") continue; // Пропускаем название модели
+
+        const paramWrapper = document.createElement('div');
+        paramWrapper.className = 'param-wrapper';
+
+        const label = document.createElement('label');
+        label.textContent = `${key}:`;
+
+        const description = document.createElement('div');
+        description.className = 'param-description';
+        description.textContent = details.description;
+
+        if (details.type.startsWith('select')) {
+            const select = document.createElement('select');
+            select.name = key;
+            const options = details.type.split(':')[1].split(',');
+
+            for (const option of options) {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                if (savedParams[key] === option) opt.selected = true;
+                select.appendChild(opt);
+            }
+
+            select.addEventListener('change', () => saveParam(model, key, select.value));
+            paramWrapper.appendChild(label);
+            paramWrapper.appendChild(select);
+            paramWrapper.appendChild(description);
+        } else if (['number', 'integer', 'float', 'bool'].includes(details.type)) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.name = key;
+            input.placeholder = ' ';
+            input.step = details.type === 'float' ? 'any' : '1';
+            input.value = savedParams[key] || '';
+            input.required = true;
+
+            input.addEventListener('input', () => saveParam(model, key, input.value));
+            paramWrapper.appendChild(label);
+            paramWrapper.appendChild(input);
+            paramWrapper.appendChild(description);
+        }
+
+        paramsDiv.appendChild(paramWrapper);
+    }
+}
+
+
+
+    function saveParam(model, key, value) {
+        const allParams = JSON.parse(localStorage.getItem('modelParams') || '{}');
+        allParams[model] = allParams[model] || {};
+        allParams[model][key] = value;
+        localStorage.setItem('modelParams', JSON.stringify(allParams));
+    }
+
+        function loadInitialParams() {
+            const modelSelect = document.getElementById('model');
+            const selectedModel = modelSelect.value;
+            updateParams(selectedModel);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadInitialParams);
+
+        document.getElementById('model').addEventListener('change', function () {
+            updateParams(this.value);
+        });
+
+// Получаем элементы модального окна
+const modal = document.getElementById('modal-container');
+const openModalBtn = document.getElementById('open-modal');
+const closeModalBtn = document.getElementById('close-modal');
+
+// Проверяем состояние модального окна в localStorage
+if (localStorage.getItem('modalOpen') === 'true') {
+    openModal();
+}
+
+// Открытие модального окна
+function openModal() {
+    modal.classList.add('show');
+    modal.classList.remove('hidden');
+    localStorage.setItem('modalOpen', 'true'); // Сохраняем состояние окна
+}
+
+// Закрытие модального окна
+function closeModal() {
+    modal.classList.remove('show');
+    modal.classList.add('hidden');
+    localStorage.setItem('modalOpen', 'false'); // Обновляем состояние окна
+}
+
+// Обработчики событий
+openModalBtn.addEventListener('click', openModal);
+closeModalBtn.addEventListener('click', closeModal);
+
+// Отключаем автоматическое закрытие при клике вне модального окна
+window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        e.stopPropagation();
+    }
+});
+
+
+</script>
+
+</body>
+</html>
